@@ -1,25 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./styles.css";
+import axios from 'axios';
 
-function App() {
+const App = () => {
+  const [pokemons, setPokemons] = useState([]);
+  const [cargando, setCargando] = useState(false);
+
+  const fetchPokemons = async () => {
+    setCargando(true);
+    try {
+      const response = await axios.get("https://pokeapi.co/api/v2/pokemon/?limit=807");
+      const data = response.data;
+      setPokemons(data.results);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+
+  const renderPokemons = () => {
+    return (
+      <ul className="lista-pokemons">
+        {pokemons.map((pokemon, index) => (
+          <li key={index}>{pokemon.name}</li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1>Pokédex</h1>
+      <button onClick={fetchPokemons} className="boton-fetch">
+        Fetch Pokemon
+      </button>
+      {cargando ? (
+        <p>Cargando...</p>
+      ) : pokemons.length > 0 ? (
+        renderPokemons()
+      ) : (
+        <p>No hay Pokémons cargados aún.</p>
+      )}
     </div>
   );
-}
+};
 
 export default App;
